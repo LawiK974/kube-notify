@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "kube-notify"
+version = "0.1.0"
+description = "A simple python app to relay k8s events to gotify"
+authors = ["wikle <loic97429@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.scripts]
+kube-notify = "kube_notify.app:main"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.31.0"
+argparse = "^1.4.0"
+PyYAML = "^6.0.1"
+kubernetes-asyncio = "^29.0.0"
+DateTime = "^5.4"
+
+[tool.poetry.dev-dependencies]
+pre-commit = "^3.6.2"
+black = "^24.2.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

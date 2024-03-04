@@ -1,0 +1,44 @@
+notifications:
+  default_group:
+    resources:
+      - name: coreApiEvents
+      - name: customResources
+    gotify:
+      url: https://gotify.example.local
+      token: CHANGEME
+    discord:
+      webhook: toto
+      username: kube-notify
+      # avatar_url: changeme
+  custom_group:
+    resources:
+      - name: customResources
+        selector:
+          types:
+            - velero.io/v1/backups
+          labels:  # list work as a "or"
+            - velero.io/schedule-name: custom-schedule
+    discord:
+      webhook: toto
+      username: kube-notify
+      # avatar_url: changeme
+
+events:
+  coreApiEvents:
+    enabled: true  # disable to not watch kubernetes core API "Events" resources
+    # pollingIntervalSeconds: 60  # Uncomment to change default
+
+  customResources:
+    - type: velero.io/v1/backups
+      # pollingIntervalSeconds: 60  # Uncomment to change default
+      namespaces: [velero]
+      includeFields:
+        # fieldName: path in yaml description of the resource/event
+        Status: status.phase
+      lastTimestamp: 'status.completionTimestamp | status.startTimestamp | metadata.creationTimestamp'
+    - type: velero.io/v1/restores
+      # pollingIntervalSeconds: 60  # Uncomment to change default
+      namespaces: [velero]
+      includeFields:
+        Status: status.phase
+      lastTimestamp: 'status.completionTimestamp | status.startTimestamp | metadata.creationTimestamp'

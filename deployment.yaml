@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-notify
+  labels:
+    app: kube-notify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kube-notify
+  template:
+    metadata:
+      labels:
+        app: kube-notify
+    spec:
+      serviceAccountName: kube-notify-watcher
+      containers:
+      - name: kube-notify
+        image: wikle/kube-notify:0.1.0
+        volumeMounts:
+        - name: config
+          mountPath: /app/config.yaml
+          readonly: true
+      volumes:
+      - name: config
+        configMap:
+          name: kube-notify-config
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-notify-watcher
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kube-notify-watcher
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kube-notify-watcher
+subjects:
+  - kind: ServiceAccount
+    name: kube-notify-watcher
+roleRef:
+  kind: Role
+  name: kube-notify-watcher
+  apiGroup: rbac.authorization.k8s.io
