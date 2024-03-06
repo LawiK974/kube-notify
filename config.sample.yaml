@@ -13,10 +13,10 @@ notifications:
   custom_group:
     resources:
       - name: customResources
-        selector:
+        selector:  # elements work as "and" to filter
           types:
             - velero.io/v1/backups
-          labels:  # list work as a "or"
+          labels:  # list works as a "or"
             - velero.io/schedule-name: custom-schedule
     discord:
       webhook: toto
@@ -33,7 +33,7 @@ events:
       # pollingIntervalSeconds: 60  # Uncomment to change default
       namespaces: [velero]
       includeFields:
-        # fieldName: path in yaml description of the resource/event
+        # dict : `fieldName: path in yaml description of the resource/event`
         Status: status.phase
       lastTimestamp: 'status.completionTimestamp | status.startTimestamp | metadata.creationTimestamp'
     - type: velero.io/v1/restores

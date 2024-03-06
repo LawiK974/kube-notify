@@ -1,14 +1,38 @@
-from kubernetes_asyncio import client, config
-import yaml
-import datetime
 import asyncio
-from kube_notify.notifications import (
-    send_discord_webhook,
-    send_gotify_message,
+import datetime
+
+import yaml
+from kubernetes_asyncio import client, config
+
+from kube_notify import parser
+from kube_notify.logger import logger
+from kube_notify.notifications import (  # send_discord_webhook,; send_gotify_message,
     handle_notify,
 )
-from kube_notify.logger import logger
-from kube_notify import STARTUP_TIME, parser
+
+
+def process_last_timestamp(obj, crd):
+    # Process last timestamp for event
+    # can be calculated using different fields if available (by order of priority)
+    for yaml_path in crd.get("lastTimestamp").split("|"):
+        value = obj.copy()
+        for key in yaml_path.strip(" ").split("."):
+            value = value.get(key, {})
+        if value:
+            last_timestamp = datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+            break
+    return last_timestamp
+
+
+def add_fields_to_the_message(obj, crd):
+    # add fields to Message
+    fields = {}
+    for key, yaml_path in crd.get("includeFields", {}).items():
+        field = obj.copy()
+        for key in yaml_path.split("."):
+            field = field.get(key, {})
+        fields[key] = field
+    return fields
 
 
 async def crds_stream(crd, namespace, kube_notify_config):
@@ -16,7 +40,6 @@ async def crds_stream(crd, namespace, kube_notify_config):
         last_event_info = None
         # Watch Velero Backups
         crd_group, crd_version, crd_plural = crd.get("type").split("/")
-        # crd_namespace = "velero" # or None for all namespaces
         crds_api = client.CustomObjectsApi(api)
         event_infos = set()
         while True:
@@ -31,7 +54,6 @@ async def crds_stream(crd, namespace, kube_notify_config):
                     crd_group, crd_version, crd_plural, watch=False
                 )
             for event in stream["items"]:
-                # event_type = event['type']
                 obj = event
                 resource_name = obj["metadata"]["name"]
                 resource_kind = obj["kind"]
@@ -41,24 +63,8 @@ async def crds_stream(crd, namespace, kube_notify_config):
                 )
 
                 # add fields to Message
-                fields = {}
-                for key, yamlPath in crd.get("includeFields", {}).items():
-                    field = obj.copy()
-                    for key in yamlPath.split("."):
-                        field = field.get(key, {})
-                    fields[key] = field
-
-                # Process last timestamp for event
-                # can be calculated using different fields if available (by order of priority)
-                for yamlPath in crd.get("lastTimestamp").split("|"):
-                    value = obj.copy()
-                    for key in yamlPath.strip(" ").split("."):
-                        value = value.get(key, {})
-                    if value:
-                        last_timestamp = datetime.datetime.strptime(
-                            value, "%Y-%m-%dT%H:%M:%SZ"
-                        )
-                        break
+                fields = add_fields_to_the_message(obj, crd)
+                last_timestamp = process_last_timestamp(obj, crd)
                 event_type = (
                     "ADDED" if creation_timestamp == last_timestamp else "UPDATED"
                 )
@@ -99,15 +105,11 @@ async def core_stream(kube_notify_config):
             stream = await core_api.list_event_for_all_namespaces(watch=False)
             for obj in stream.items:
                 event_type = obj.type
-                # obj = event.object
                 resource_name = obj.metadata.name
                 resource_kind = obj.kind or "Event"
-                last_timestamp = str(
+                last_timestamp = (
                     obj.last_timestamp or obj.event_time or obj.creation_timestamp
-                )
-                last_timestamp = datetime.datetime.strptime(
-                    last_timestamp, "%Y-%m-%d %H:%M:%S%z"
-                )
+                ).replace(tzinfo=None)
                 message = obj.message
                 title = f"{resource_kind} {event_type}"
                 description = f"{event_type} {resource_kind} : {obj.involved_object.kind} {obj.involved_object.name} {obj.reason}."
@@ -154,7 +156,6 @@ def load_kube_notify_config(config_path):
     with open(config_path) as f:
         kube_notify_config = yaml.safe_load(f)
     return kube_notify_config
-    # for event in kube_notify_config["events"].get("customResources", []):
 
 
 def main():
@@ -162,14 +163,14 @@ def main():
     # Initialize Kubernetes client
     ioloop = asyncio.get_event_loop()
     if args.inCluster:
-        ioloop.run_until_complete(config.load_incluster_config())
+        ioloop.run_until_complete(config.load_incluster_config(context=args.context))
     else:
-        ioloop.run_until_complete(config.load_kube_config())
+        ioloop.run_until_complete(config.load_kube_config(context=args.context))
 
     kube_notify_config = load_kube_notify_config(args.config)
     tasks = []
     if kube_notify_config["events"].get("coreApiEvents").get("enabled"):
-        logger.info(f"Creating watcher for coreApiEvents")
+        logger.info("Creating watcher for coreApiEvents")
         tasks.append(asyncio.ensure_future(core_stream(kube_notify_config)))
 
     for index, crd in enumerate(

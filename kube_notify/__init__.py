@@ -1,5 +1,5 @@
-import datetime
 import argparse
+import datetime
 
 STARTUP_TIME = datetime.datetime.utcnow()
 
@@ -11,3 +11,8 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument("-c", "--config", type=str, help="Path to the config file")
 parser.add_argument("--inCluster", action="store_true", help="Running in cluster")
+parser.add_argument(
+    "--context",
+    type=str,
+    help="Kube config context to use (check `kubectl config current-context`)",
+)

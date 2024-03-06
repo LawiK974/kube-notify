@@ -1,7 +1,9 @@
-import requests
 import json
-from kube_notify.logger import logger
+
+import requests
+
 from kube_notify import STARTUP_TIME
+from kube_notify.logger import logger
 
 
 def check_selector(resource_name, resources, resource_type, labels):
@@ -10,7 +12,10 @@ def check_selector(resource_name, resources, resource_type, labels):
             selectors = resource.get("selector", {})
             return resource_type in selectors.get("types", [resource_type]) and (
                 selectors.get("labels") is None
-                or any({l: v} in selectors.get("labels") for l, v in labels.items())
+                or any(
+                    {key: value} in selectors.get("labels")
+                    for key, value in labels.items()
+                )
             )
     return False
 
@@ -25,24 +30,22 @@ async def handle_notify(
     resource_type,
     labels,
 ):
+    notifs = ["Skipping"]
     if event_info[0].timestamp() > STARTUP_TIME.timestamp():
         # Send notification
-        notifs = []
+        notifs = ["Unhandled"]
         for group_name, group in kube_notify_config.get("notifications", {}).items():
             if check_selector(
                 resource_name, group.get("resources"), resource_type, labels
             ):
+                notifs = []
                 if group.get("discord"):
                     notifs.append(f"{group_name}/discord")
                     # send_discord_webhook(group.get("discord")["webhook"], title, description, fields, group.get("discord").get("username"), group.get("discord").get("avatar_url"))
                 if group.get("gotify"):
                     notifs.append(f"{group_name}/gotify")
                     # send_gotify_message(group.get("gotify")["webhook"], title, description, fields)
-        logger.info(
-            f"[{','.join(notifs) or 'Unhandled'}] {event_info[0]} > {STARTUP_TIME} {description}"
-        )
-    else:
-        logger.debug(f"[Skipping] {event_info[0]} < {STARTUP_TIME} {description}")
+    logger.info(f"{event_info[0]} [{','.join(notifs)}] {description}")
 
 
 def send_gotify_message(url, token, title, description, fields):

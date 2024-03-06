@@ -1,5 +1,6 @@
 import logging
 import sys
+
 from kube_notify import STARTUP_TIME
 
 logger = logging.getLogger("k8s_events")
