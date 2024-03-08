@@ -977,7 +977,7 @@ idna = ">=2.0"
 multidict = ">=4.0"
 
 [[package]]
-name = "zope.interface"
+name = "zope-interface"
 version = "6.2"
 description = "Interfaces for Python"
 category = "main"

@@ -2,8 +2,8 @@ import json
 
 import requests
 
-from kube_notify import STARTUP_TIME
-from kube_notify.logger import logger
+import kube_notify
+import kube_notify.logger as logger
 
 
 def check_selector(resource_name, resources, resource_type, labels):
@@ -31,7 +31,7 @@ async def handle_notify(
     labels,
 ):
     notifs = ["Skipping"]
-    if event_info[0].timestamp() > STARTUP_TIME.timestamp():
+    if event_info[0].timestamp() > kube_notify.STARTUP_TIME.timestamp():
         # Send notification
         notifs = ["Unhandled"]
         for group_name, group in kube_notify_config.get("notifications", {}).items():
@@ -41,11 +41,22 @@ async def handle_notify(
                 notifs = []
                 if group.get("discord"):
                     notifs.append(f"{group_name}/discord")
-                    # send_discord_webhook(group.get("discord")["webhook"], title, description, fields, group.get("discord").get("username"), group.get("discord").get("avatar_url"))
+                    discord = group.get("discord")
+                    send_discord_webhook(
+                        discord["webhook"],
+                        title,
+                        description,
+                        fields,
+                        discord.get("username"),
+                        discord.get("avatar_url"),
+                    )
                 if group.get("gotify"):
+                    gotify = group.get("gotify")
                     notifs.append(f"{group_name}/gotify")
-                    # send_gotify_message(group.get("gotify")["webhook"], title, description, fields)
-    logger.info(f"{event_info[0]} [{','.join(notifs)}] {description}")
+                    send_gotify_message(
+                        gotify["webhook"], gotify["token"], title, description, fields
+                    )
+    logger.logger.info(f"{event_info[0]} [{','.join(notifs)}] {description}")
 
 
 def send_gotify_message(url, token, title, description, fields):
@@ -64,7 +75,7 @@ def send_gotify_message(url, token, title, description, fields):
     data = {"title": title, "message": message}
     response = requests.post(url, headers=headers, data=json.dumps(data))
     if response.status_code != 200:
-        logger.error("Failed to send notification to Gotify")
+        logger.logger.error("Failed to send notification to Gotify")
 
 
 def send_discord_webhook(
@@ -92,4 +103,4 @@ def send_discord_webhook(
         data["avatar_url"] = avatar_url
     response = requests.post(webhook_url, headers=headers, data=json.dumps(data))
     if response.status_code != 204:
-        logger.error("Failed to send notification to Discord")
+        logger.logger.error("Failed to send notification to Discord")
