@@ -54,24 +54,18 @@ async def handle_notify(
                     gotify = group.get("gotify")
                     notifs.append(f"{group_name}/gotify")
                     send_gotify_message(
-                        gotify["webhook"], gotify["token"], title, description, fields
+                        gotify["url"], gotify["token"], title, description, fields
                     )
     logger.logger.info(f"{event_info[0]} [{','.join(notifs)}] {description}")
 
 
 def send_gotify_message(url, token, title, description, fields):
     # Construct the HTTP request for sending a message to Gotify
-    url = f"{url}/message?token={token}"
+    url = f"{url}/message?token={token}&format=markdown"
     headers = {"Content-Type": "application/json"}
     message = description + "\n"
-    i = 0
     for key, value in fields.items():
-        if i % 2:
-            message += "\n"
-        else:
-            message += " | "
-        message += f"{key}: {value}"
-        i += 1
+        message += f"- {key}: {value}\n"
     data = {"title": title, "message": message}
     response = requests.post(url, headers=headers, data=json.dumps(data))
     if response.status_code != 200:
