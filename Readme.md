@@ -17,7 +17,7 @@ kubectl create cm kube-notify-config -n monitoring --from-file config.yaml
 2. Deploy resources (deployement + rbac) in `monitoring` namespace :
 
 ```sh
-kubectl apply -n monitoring -f deployement.yaml
+kubectl apply -f deployement.yaml
 ```
 
 ## Configuration

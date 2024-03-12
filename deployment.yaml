@@ -2,6 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: monitoring
   name: kube-notify
   labels:
     app: kube-notify
@@ -22,6 +23,7 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /app/config.yaml
+          subPath: config.yaml
       volumes:
       - name: config
         configMap:
@@ -32,24 +34,33 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kube-notify-watcher
+  namespace: monitoring
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
+  namespace: "*"
   name: kube-notify-watcher
 rules:
-  - apiGroups: ["*"]
-    resources: ["*"]
+  - apiGroups:
+    - "*"
+    resources:
+    - "*"
+    verbs:  ["get", "watch", "list"]
+  - nonResourceURLs:
+    - "*"
     verbs: ["get", "watch", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: kube-notify-watcher
+  namespace: monitoring
 subjects:
   - kind: ServiceAccount
+    namespace: monitoring
     name: kube-notify-watcher
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: kube-notify-watcher
   apiGroup: rbac.authorization.k8s.io
