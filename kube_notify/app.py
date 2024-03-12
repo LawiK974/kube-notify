@@ -167,9 +167,7 @@ def main():
     # Initialize Kubernetes client
     ioloop = asyncio.get_event_loop()
     if args.inCluster:
-        ioloop.run_until_complete(
-            kubernetes_asyncio.config.load_incluster_config(context=args.context)
-        )
+        ioloop.run_until_complete(kubernetes_asyncio.config.load_incluster_config())
     else:
         ioloop.run_until_complete(
             kubernetes_asyncio.config.load_kube_config(context=args.context)

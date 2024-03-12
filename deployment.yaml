@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,11 +18,10 @@ spec:
       serviceAccountName: kube-notify-watcher
       containers:
       - name: kube-notify
-        image: wikle/kube-notify:0.1.0
+        image: wikle/kube-notify:latest
         volumeMounts:
         - name: config
           mountPath: /app/config.yaml
-          readonly: true
       volumes:
       - name: config
         configMap:
