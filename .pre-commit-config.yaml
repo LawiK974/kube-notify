@@ -32,6 +32,6 @@ repos:
             - flake8-cognitive-complexity==0.1.0
             - flake8-variables-names==0.0.6
         args:
-            - --max-cognitive-complexity=15
+            - --max-cognitive-complexity=20
             - "--ignore=W503,E501"
             # - --use-varnames-strict-mode

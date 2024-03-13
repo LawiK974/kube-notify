@@ -6,17 +6,46 @@ import kube_notify
 import kube_notify.logger as logger
 
 
-def check_selector(resource_name, resources, resource_type, labels):
+def check_selector(
+    resource_name, resources, resource_type, labels, involved_object_kind
+):
     for resource in resources:
         if resource["name"] == resource_name:
-            selectors = resource.get("selector", {})
-            return resource_type in selectors.get("types", [resource_type]) and (
-                selectors.get("labels") is None
-                or any(
-                    {key: value} in selectors.get("labels")
-                    for key, value in labels.items()
+            if "selector" in resource:
+                selectors = resource.get("selector", {})
+                return (
+                    resource_type in selectors.get("types", [resource_type])
+                    and (
+                        selectors.get("labels") is None
+                        or any(
+                            (
+                                label.get("key"),
+                                label.get("value", labels.get(label.get("key"))),
+                            )
+                            in labels.items()
+                            for label in selectors.get("labels", [])
+                        )
+                    )
+                    and (
+                        selectors.get("involvedObjectKind") is None
+                        or involved_object_kind in selectors.get("involvedObjectKind")
+                    )
                 )
-            )
+            elif "excludeSelector" in resource:
+                selectors = resource.get("excludeSelector", {})
+                return not (
+                    resource_type in selectors.get("types", [])
+                    or any(
+                        (
+                            label.get("key"),
+                            label.get("value", labels.get(label.get("key"))),
+                        )
+                        in labels.items()
+                        for label in selectors.get("labels", [])
+                    )
+                    or involved_object_kind in selectors.get("involvedObjectKind", [])
+                )
+            return True
     return False
 
 
@@ -29,14 +58,19 @@ async def handle_notify(
     kube_notify_config,
     resource_type,
     labels,
+    involved_object_kind=None,
 ):
     notifs = ["Skipping"]
     if event_info[0].timestamp() > kube_notify.STARTUP_TIME.timestamp():
         # Send notification
-        notifs = ["Unhandled"]
+        notifs = ["Excluded"]
         for group_name, group in kube_notify_config.get("notifications", {}).items():
             if check_selector(
-                resource_name, group.get("resources"), resource_type, labels
+                resource_name,
+                group.get("resources"),
+                resource_type,
+                labels,
+                involved_object_kind,
             ):
                 notifs = []
                 if group.get("discord"):
@@ -63,10 +97,16 @@ def send_gotify_message(url, token, title, description, fields):
     # Construct the HTTP request for sending a message to Gotify
     url = f"{url}/message?token={token}&format=markdown"
     headers = {"Content-Type": "application/json"}
-    message = description + "\n"
+    message = f"**{description}**\n\n"
+    message += "| Clé | Valeur |\n"
+    message += "| ---- | ---- |\n"
     for key, value in fields.items():
-        message += f"- {key}: {value}\n"
-    data = {"title": title, "message": message}
+        message += f"| {key} | {value} |\n"
+    data = {
+        "title": title,
+        "message": message,
+        "extras": {"client::display": {"contentType": "text/markdown"}},
+    }
     response = requests.post(url, headers=headers, data=json.dumps(data))
     if response.status_code != 200:
         logger.logger.error("Failed to send notification to Gotify")

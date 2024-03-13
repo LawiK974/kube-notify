@@ -2,6 +2,15 @@ notifications:
   default_group:
     resources:
       - name: coreApiEvents
+        excludeSelector:  # use `excludeSelector` to exclude events that match one of the following
+          involvedObjectKind:  # list work as a `or`
+            - Job
+            - CronJob
+            # - Pod
+          labels:  # kube-notify merge event labels (should be null) with involvedObject labels if is Pod
+            - key: job-name
+          # types:
+            # - Normal
       - name: customResources
     gotify:
       url: https://gotify.example.local
@@ -13,11 +22,12 @@ notifications:
   custom_group:
     resources:
       - name: customResources
-        selector:  # elements work as "and" to filter
-          types:
+        selector:  # elements work as "and" to filter custom resources
+          types:   # list works as a "or"
             - velero.io/v1/backups
           labels:  # list works as a "or"
-            - velero.io/schedule-name: custom-schedule
+            - key: velero.io/schedule-name
+              value: custom-schedule
     discord:
       webhook: toto
       username: kube-notify
