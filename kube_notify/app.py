@@ -121,15 +121,15 @@ async def core_stream(kube_notify_config):
                     involved_object_name = str(obj.involved_object.name)
                     involved_object_namespace = str(obj.involved_object.namespace)
 
-                    title = f"{resource_kind} {event_type}"
+                    title = f"{event_type} {resource_kind}"
                     description = f"{event_type} {resource_kind} : {involved_object_kind} {involved_object_name} {reason}."
                     fields = {
+                        "Message": message,
                         "Reason": reason,
                         "Type": event_type,
-                        "Message": message,
+                        "Object kind": involved_object_kind,
+                        "Object name": involved_object_name,
                         "Timestamp": last_timestamp.isoformat(),
-                        "Involved Object kind": involved_object_kind,
-                        "Involved Object name": involved_object_name,
                         "Namespace": str(obj.metadata.namespace),
                     }
                     event_info = (

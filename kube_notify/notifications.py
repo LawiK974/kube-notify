@@ -98,10 +98,10 @@ def send_gotify_message(url, token, title, description, fields):
     url = f"{url}/message?token={token}&format=markdown"
     headers = {"Content-Type": "application/json"}
     message = f"**{description}**\n\n"
-    message += "| Clé | Valeur |\n"
+    message += "|  |  |\n"
     message += "| ---- | ---- |\n"
     for key, value in fields.items():
-        message += f"| {key} | {value} |\n"
+        message += f"| {key} | **{value}** |\n"
     data = {
         "title": title,
         "message": message,
