@@ -27,8 +27,8 @@ def add_fields_to_the_message(obj, crd):
     fields = {}
     for key, yaml_path in crd.get("includeFields", {}).items():
         field = obj.copy()
-        for key in yaml_path.split("."):
-            field = field.get(key, {})
+        for yaml_key in yaml_path.split("."):
+            field = field.get(yaml_key, {})
         fields[key] = str(field)
     return fields
 
@@ -54,6 +54,7 @@ async def crds_stream(crd, namespace, kube_notify_config):
                     )
                 for obj in stream["items"]:
                     resource_name = str(obj["metadata"]["name"])
+                    resource_namespace = str(obj["metadata"]["namespace"])
                     resource_kind = str(obj["kind"])
                     resource_apiversion = str(obj["apiVersion"])
                     creation_timestamp = datetime.datetime.strptime(
@@ -64,6 +65,7 @@ async def crds_stream(crd, namespace, kube_notify_config):
                     fields = add_fields_to_the_message(obj, crd)
                     last_timestamp = process_last_timestamp(obj, crd)
                     fields["Timestamp"] = last_timestamp.isoformat()
+                    fields["Namespace"] = resource_namespace
                     event_type = (
                         "ADDED" if creation_timestamp == last_timestamp else "UPDATED"
                     )
@@ -74,6 +76,7 @@ async def crds_stream(crd, namespace, kube_notify_config):
                         resource_apiversion,
                         resource_kind,
                         resource_name,
+                        resource_namespace,
                     )
                     if event_info in event_infos or last_event_info == event_info:
                         continue
@@ -89,6 +92,7 @@ async def crds_stream(crd, namespace, kube_notify_config):
                         kube_notify_config,
                         crd.get("type"),
                         dict(obj["metadata"].get("labels", {})),
+                        resource_namespace,
                     )
                     await asyncio.sleep(0)
                 del stream
@@ -122,7 +126,9 @@ async def core_stream(kube_notify_config):
                     involved_object_namespace = str(obj.involved_object.namespace)
 
                     title = f"{event_type} {resource_kind}"
-                    description = f"{event_type} {resource_kind} : {involved_object_kind} {involved_object_name} {reason}."
+                    description = (
+                        f"{involved_object_kind} {involved_object_name} {reason}."
+                    )
                     fields = {
                         "Message": message,
                         "Reason": reason,
@@ -130,15 +136,16 @@ async def core_stream(kube_notify_config):
                         "Object kind": involved_object_kind,
                         "Object name": involved_object_name,
                         "Timestamp": last_timestamp.isoformat(),
-                        "Namespace": str(obj.metadata.namespace),
+                        "Namespace": involved_object_namespace,
                     }
                     event_info = (
                         last_timestamp,
+                        involved_object_namespace,
                         event_type,
-                        resource_kind,
+                        involved_object_kind,
+                        involved_object_name,
                         reason,
                         resource_name,
-                        event_type,
                         message,
                     )
                     labels = dict(obj.metadata.labels or {})
@@ -163,6 +170,7 @@ async def core_stream(kube_notify_config):
                         kube_notify_config,
                         event_type,
                         labels,
+                        involved_object_namespace,
                         involved_object_kind,
                     )
                     await asyncio.sleep(0)

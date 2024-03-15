@@ -7,7 +7,7 @@ import kube_notify.logger as logger
 
 
 def check_selector(
-    resource_name, resources, resource_type, labels, involved_object_kind
+    resource_name, resources, resource_type, labels, namespace, involved_object_kind
 ):
     for resource in resources:
         if resource["name"] == resource_name:
@@ -30,6 +30,10 @@ def check_selector(
                         selectors.get("involvedObjectKind") is None
                         or involved_object_kind in selectors.get("involvedObjectKind")
                     )
+                    and (
+                        selectors.get("namespaces") is None
+                        or namespace in selectors.get("namespaces")
+                    )
                 )
             elif "excludeSelector" in resource:
                 selectors = resource.get("excludeSelector", {})
@@ -44,9 +48,28 @@ def check_selector(
                         for label in selectors.get("labels", [])
                     )
                     or involved_object_kind in selectors.get("involvedObjectKind", [])
+                    or namespace in selectors.get("namespaces", [])
                 )
             return True
     return False
+
+
+def get_status_icon(event_type, fields):
+    if event_type == "Warning":
+        return "⚠️"
+    if event_type == "Normal":
+        return "✅"
+    if fields.get("Status") == "Completed":
+        return "✅"
+    if fields.get("Status") == "InProgress":
+        return "⏳"
+    if fields.get("Status") == "New":
+        return "🆕"
+    if fields.get("Status") == "PartiallyFailed":
+        return "⚠️"
+    if fields.get("Status") == "Failed":
+        return "❌"
+    return ""
 
 
 async def handle_notify(
@@ -58,6 +81,7 @@ async def handle_notify(
     kube_notify_config,
     resource_type,
     labels,
+    namespace,
     involved_object_kind=None,
 ):
     notifs = ["Skipping"]
@@ -70,9 +94,12 @@ async def handle_notify(
                 group.get("resources"),
                 resource_type,
                 labels,
+                namespace,
                 involved_object_kind,
             ):
                 notifs = []
+                status_icon = get_status_icon(resource_type, fields)
+                description = f"[{status_icon}] {description}"
                 if group.get("discord"):
                     notifs.append(f"{group_name}/discord")
                     discord = group.get("discord")
@@ -98,10 +125,9 @@ def send_gotify_message(url, token, title, description, fields):
     url = f"{url}/message?token={token}&format=markdown"
     headers = {"Content-Type": "application/json"}
     message = f"**{description}**\n\n"
-    message += "|  |  |\n"
-    message += "| ---- | ---- |\n"
+
     for key, value in fields.items():
-        message += f"| {key} | **{value}** |\n"
+        message += f"**{key} :**\n{value}\n\n"
     data = {
         "title": title,
         "message": message,

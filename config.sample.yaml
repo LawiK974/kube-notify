@@ -9,6 +9,8 @@ notifications:
             # - Pod
           labels:  # kube-notify merge event labels (should be null) with involvedObject labels if is Pod
             - key: job-name
+          # namespaces:
+          #   - kube-system
           # types:
             # - Normal
       - name: customResources
