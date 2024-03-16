@@ -11,9 +11,10 @@ def check_selector(
 ):
     for resource in resources:
         if resource["name"] == resource_name:
+            result = True
             if "selector" in resource:
                 selectors = resource.get("selector", {})
-                return (
+                result = (
                     resource_type in selectors.get("types", [resource_type])
                     and (
                         selectors.get("labels") is None
@@ -37,7 +38,7 @@ def check_selector(
                 )
             elif "excludeSelector" in resource:
                 selectors = resource.get("excludeSelector", {})
-                return not (
+                result = not (
                     resource_type in selectors.get("types", [])
                     or any(
                         (
@@ -50,7 +51,8 @@ def check_selector(
                     or involved_object_kind in selectors.get("involvedObjectKind", [])
                     or namespace in selectors.get("namespaces", [])
                 )
-            return True
+            if result:
+                return result
     return False
 
 
