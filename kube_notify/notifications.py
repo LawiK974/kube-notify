@@ -87,6 +87,8 @@ async def handle_notify(
     involved_object_kind=None,
 ):
     notifs = ["Skipping"]
+    status_icon = get_status_icon(resource_type, fields)
+    description = f"[{status_icon}] {description}"
     if event_info[0].timestamp() > kube_notify.STARTUP_TIME.timestamp():
         # Send notification
         notifs = ["Excluded"]
@@ -100,8 +102,6 @@ async def handle_notify(
                 involved_object_kind,
             ):
                 notifs = []
-                status_icon = get_status_icon(resource_type, fields)
-                description = f"[{status_icon}] {description}"
                 if group.get("discord"):
                     notifs.append(f"{group_name}/discord")
                     discord = group.get("discord")
