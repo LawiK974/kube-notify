@@ -1,5 +1,12 @@
 # Kube Gotify
 
+![GitHub License](https://img.shields.io/github/license/LawiK974/kube-notify)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+![GitHub Release](https://img.shields.io/github/v/release/LawiK974/kube-notify?display_name=release&link=https%3A%2F%2Fgithub.com%2FLawiK974%2Fkube-notify%2Freleases%2Flatest)
+![GitHub Actions Workflow Status Main](https://img.shields.io/github/actions/workflow/status/LawiK974/kube-notify/github-actions-docker.yml?branch=main&label=Build%26Push%20Main)
+![GitHub Actions Workflow Status Release](https://img.shields.io/github/actions/workflow/status/LawiK974/kube-notify/github-actions-docker-tags.yml?label=Build%26Push%20Release)
+
+
 An app that watches kubernetes resource creation, deletion, updates and errors events and notify selected events to gotify.
 
 ## Screenshots
@@ -35,9 +42,9 @@ Use [sample config](./config.sample.yaml) as an example.
 
 - [ ] Optimize Code
 - [ ] Badges
-  - [ ] Latest release
-  - [ ] CI passing
-  - [ ] License
+  - [x] Latest release
+  - [x] CI passing
+  - [x] License
   - [ ] Coverage
 - [ ] Add OpenAI module to send recomendation messages for non-normal events.
 - [ ] Documenting
