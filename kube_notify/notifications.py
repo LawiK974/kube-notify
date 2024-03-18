@@ -7,7 +7,13 @@ import kube_notify.logger as logger
 
 
 def check_selector(
-    resource_name, resources, resource_type, labels, namespace, involved_object_kind
+    resource_name,
+    resources,
+    resource_type,
+    labels,
+    namespace,
+    involved_object_kind,
+    reason,
 ):
     for resource in resources:
         if resource["name"] == resource_name:
@@ -35,6 +41,10 @@ def check_selector(
                         selectors.get("namespaces") is None
                         or namespace in selectors.get("namespaces")
                     )
+                    and (
+                        selectors.get("reasons") is None
+                        or reason in selectors.get("reasons")
+                    )
                 )
             elif "excludeSelector" in resource:
                 selectors = resource.get("excludeSelector", {})
@@ -50,6 +60,7 @@ def check_selector(
                     )
                     or involved_object_kind in selectors.get("involvedObjectKind", [])
                     or namespace in selectors.get("namespaces", [])
+                    or reason in selectors.get("reasons", [])
                 )
             if result:
                 return result
@@ -85,6 +96,7 @@ async def handle_notify(
     labels,
     namespace,
     involved_object_kind=None,
+    reason=None,
 ):
     notifs = ["Skipping"]
     status_icon = get_status_icon(resource_type, fields)
@@ -100,6 +112,7 @@ async def handle_notify(
                 labels,
                 namespace,
                 involved_object_kind,
+                reason,
             ):
                 notifs = []
                 if group.get("discord"):

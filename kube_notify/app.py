@@ -172,6 +172,7 @@ async def core_stream(kube_notify_config):
                         labels,
                         involved_object_namespace,
                         involved_object_kind,
+                        reason,
                     )
                     await asyncio.sleep(0)
                 del stream
