@@ -1,5 +1,5 @@
 # Stage 1: Builder stage where the package is built using Poetry
-FROM python:3.12-slim as builder
+FROM python:3.12-alpine as builder
 
 WORKDIR /app
 RUN pip install poetry
@@ -12,7 +12,7 @@ RUN poetry install --no-root --no-dev
 RUN poetry build
 
 # Stage 2: Lightweight production stage with minimal footprint
-FROM python:3.12-slim as production
+FROM python:3.12-alpine as production
 WORKDIR /app
 COPY --from=builder /app/dist/*.whl /app/
 RUN pip install --no-cache-dir /app/*.whl
