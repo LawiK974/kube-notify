@@ -17,4 +17,5 @@ FROM python:3.12-alpine as production
 WORKDIR /app
 COPY --from=builder /app/dist/*.whl /app/
 RUN pip install --no-cache-dir /app/*.whl
+ENV PYTHONUNBUFFERED=1
 CMD ["kube-notify", "--config", "/app/config.yaml", "--inCluster"]
