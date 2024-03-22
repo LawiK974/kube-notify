@@ -2,6 +2,7 @@
 FROM python:3.12-alpine as builder
 
 WORKDIR /app
+RUN apk add gcc
 RUN pip install poetry
 COPY . /app
 # Disable virtual env creation by poetry, it's not needed in Docker
