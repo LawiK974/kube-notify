@@ -1,4 +1,4 @@
-# Kube Gotify
+# Kube Notify
 
 ![GitHub License](https://img.shields.io/github/license/LawiK974/kube-notify)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
@@ -47,6 +47,7 @@ Use [sample config](./config.sample.yaml) as an example.
   - [x] License
   - [ ] Coverage
 - [ ] Add OpenAI module to send recomendation messages for non-normal events.
+- [ ] Create Helm chart
 - [ ] Documenting
   - [x] Installation
   - [ ] Configuration
@@ -59,6 +60,7 @@ Use [sample config](./config.sample.yaml) as an example.
 - [ ] Automation (GitHub Actions)
   - [ ] Coverage tests
   - [x] pre-commit
+  - [ ] Trivy security scan
   - [x] Docker build & push (latest + releases)
 
 ## References
