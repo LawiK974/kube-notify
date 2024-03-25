@@ -18,7 +18,7 @@ DateTime = "^5.5"
 pytz = "^2024.1"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "^3.6.2"
+pre-commit = "^3.7.0"
 black = "^24.3.0"
 
 [build-system]
