@@ -1,73 +1,11 @@
-import json
-
-import requests
-
 import kube_notify
+import kube_notify.discord as discord
+import kube_notify.gotify as gotify
 import kube_notify.logger as logger
+import kube_notify.selectors as selectors
 
 
-def check_selector(
-    resource_name,
-    resources,
-    resource_type,
-    labels,
-    namespace,
-    involved_object_kind,
-    reason,
-):
-    for resource in resources:
-        if resource["name"] == resource_name:
-            result = True
-            if "selector" in resource:
-                selectors = resource.get("selector", {})
-                result = (
-                    resource_type in selectors.get("types", [resource_type])
-                    and (
-                        selectors.get("labels") is None
-                        or any(
-                            (
-                                label.get("key"),
-                                label.get("value", labels.get(label.get("key"))),
-                            )
-                            in labels.items()
-                            for label in selectors.get("labels", [])
-                        )
-                    )
-                    and (
-                        selectors.get("involvedObjectKind") is None
-                        or involved_object_kind in selectors.get("involvedObjectKind")
-                    )
-                    and (
-                        selectors.get("namespaces") is None
-                        or namespace in selectors.get("namespaces")
-                    )
-                    and (
-                        selectors.get("reasons") is None
-                        or reason in selectors.get("reasons")
-                    )
-                )
-            elif "excludeSelector" in resource:
-                selectors = resource.get("excludeSelector", {})
-                result = not (
-                    resource_type in selectors.get("types", [])
-                    or any(
-                        (
-                            label.get("key"),
-                            label.get("value", labels.get(label.get("key"))),
-                        )
-                        in labels.items()
-                        for label in selectors.get("labels", [])
-                    )
-                    or involved_object_kind in selectors.get("involvedObjectKind", [])
-                    or namespace in selectors.get("namespaces", [])
-                    or reason in selectors.get("reasons", [])
-                )
-            if result:
-                return result
-    return False
-
-
-def get_status_icon(event_type, fields):
+def get_status_icon(event_type: str, fields: dict) -> str:
     if event_type == "Warning":
         return "⚠️"
     if event_type == "Normal":
@@ -86,18 +24,18 @@ def get_status_icon(event_type, fields):
 
 
 async def handle_notify(
-    resource_name,
-    title,
-    description,
-    fields,
-    event_info,
-    kube_notify_config,
-    resource_type,
-    labels,
-    namespace,
-    involved_object_kind=None,
-    reason=None,
-):
+    resource_name: str,
+    title: str,
+    description: str,
+    fields: dict,
+    event_info: str,
+    kube_notify_config: dict,
+    resource_type: str,
+    labels: dict,
+    namespace: str,
+    involved_object_kind: str = None,
+    reason: str = None,
+) -> None:
     notifs = ["Skipping"]
     status_icon = get_status_icon(resource_type, fields)
     description = f"[{status_icon}] {description}"
@@ -105,7 +43,7 @@ async def handle_notify(
         # Send notification
         notifs = ["Excluded"]
         for group_name, group in kube_notify_config.get("notifications", {}).items():
-            if check_selector(
+            if selectors.check_selector(
                 resource_name,
                 group.get("resources"),
                 resource_type,
@@ -115,67 +53,23 @@ async def handle_notify(
                 reason,
             ):
                 notifs = []
-                if group.get("discord"):
+                if group_values := group.get("discord"):
                     notifs.append(f"{group_name}/discord")
-                    discord = group.get("discord")
-                    send_discord_webhook(
-                        discord["webhook"],
+                    discord.send_discord_webhook(
+                        group_values["webhook"],
                         title,
                         description,
                         fields,
-                        discord.get("username"),
-                        discord.get("avatar_url"),
+                        group_values.get("username"),
+                        group_values.get("avatar_url"),
                     )
-                if group.get("gotify"):
-                    gotify = group.get("gotify")
+                if group_values := group.get("gotify"):
                     notifs.append(f"{group_name}/gotify")
-                    send_gotify_message(
-                        gotify["url"], gotify["token"], title, description, fields
+                    gotify.send_gotify_message(
+                        group_values["url"],
+                        group_values["token"],
+                        title,
+                        description,
+                        fields,
                     )
     logger.logger.info(f"{event_info[0]} [{','.join(notifs)}] {description}")
-
-
-def send_gotify_message(url, token, title, description, fields):
-    # Construct the HTTP request for sending a message to Gotify
-    url = f"{url}/message?token={token}&format=markdown"
-    headers = {"Content-Type": "application/json"}
-    message = f"**{description}**\n\n"
-
-    for key, value in fields.items():
-        message += f"**{key} :**\n{value}\n\n"
-    data = {
-        "title": title,
-        "message": message,
-        "extras": {"client::display": {"contentType": "text/markdown"}},
-    }
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-    if response.status_code != 200:
-        logger.logger.error("Failed to send notification to Gotify")
-
-
-def send_discord_webhook(
-    webhook_url, title, description, fields, username="kube-notify", avatar_url=None
-):
-    # Construct the HTTP request for sending a message to Discord via the Webhook
-    headers = {"Content-Type": "application/json"}
-
-    data = {
-        "embeds": [
-            {
-                "title": title,
-                "description": description,
-                "fields": [
-                    {"name": key, "value": value, "inline": True}
-                    for key, value in fields.items()
-                ],
-            }
-        ]
-    }
-    # Optionally add username and avatar_url to customize the webhook message sender
-    if username:
-        data["username"] = username
-    if avatar_url:
-        data["avatar_url"] = avatar_url
-    response = requests.post(webhook_url, headers=headers, data=json.dumps(data))
-    if response.status_code != 204:
-        logger.logger.error("Failed to send notification to Discord")

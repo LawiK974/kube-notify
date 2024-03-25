@@ -9,7 +9,7 @@ import kube_notify.logger as logger
 import kube_notify.notifications as notifs
 
 
-def process_last_timestamp(obj, crd):
+def process_last_timestamp(obj: dict, crd: dict) -> datetime.datetime:
     # Process last timestamp for event
     # can be calculated using different fields if available (by order of priority)
     for yaml_path in crd.get("lastTimestamp").split("|"):
@@ -22,7 +22,7 @@ def process_last_timestamp(obj, crd):
     return last_timestamp
 
 
-def add_fields_to_the_message(obj, crd):
+def add_fields_to_the_message(obj: dict, crd: dict) -> dict:
     # add fields to Message
     fields = {}
     for key, yaml_path in crd.get("includeFields", {}).items():
@@ -33,7 +33,7 @@ def add_fields_to_the_message(obj, crd):
     return fields
 
 
-async def crds_stream(crd, namespace, kube_notify_config):
+async def crds_stream(crd: dict, namespace: str, kube_notify_config: dict) -> None:
     async with kubernetes_asyncio.client.ApiClient() as api:
         last_event_info = None
         # Watch Velero Backups
@@ -101,7 +101,7 @@ async def crds_stream(crd, namespace, kube_notify_config):
             await asyncio.sleep(crd.get("pollingIntervalSeconds", 60))
 
 
-async def core_stream(kube_notify_config):
+async def core_stream(kube_notify_config: dict) -> None:
     async with kubernetes_asyncio.client.ApiClient() as api:
         last_event_info = None
         core_api = kubernetes_asyncio.client.CoreV1Api(api)
@@ -185,13 +185,13 @@ async def core_stream(kube_notify_config):
             )
 
 
-def load_kube_notify_config(config_path):
+def load_kube_notify_config(config_path: str) -> dict:
     with open(config_path) as f:
         kube_notify_config = yaml.safe_load(f)
     return kube_notify_config
 
 
-def main():
+def main() -> None:
     args = kube_notify.parser.parse_args()
     # Initialize Kubernetes client
     ioloop = asyncio.get_event_loop()
