@@ -193,6 +193,9 @@ def load_kube_notify_config(config_path: str) -> dict:
 
 def main() -> None:
     args = kube_notify.parser.parse_args()
+    logger.logger.info(
+        f"Starting kube-notify {kube_notify.__version__} at {kube_notify.STARTUP_TIME}"
+    )
     # Initialize Kubernetes client
     ioloop = asyncio.get_event_loop()
     if args.inCluster:
