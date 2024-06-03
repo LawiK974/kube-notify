@@ -21,7 +21,7 @@ repos:
         args: [--preview]
 
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.18.2  # Specify the desired version of Gitleaks
+  rev: v8.18.3  # Specify the desired version of Gitleaks
   hooks:
     - id: gitleaks
 
