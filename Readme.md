@@ -54,13 +54,13 @@ Use [sample config](./config.sample.yaml) as an example.
 - [ ] Notification services
   - [x] Discord
   - [x] Gotify
-  - [ ] Mattermost
+  - [x] Mattermost
   - [ ] Slack
   - [ ] Telegram
 - [ ] Automation (GitHub Actions)
   - [ ] Coverage tests
   - [x] pre-commit
-  - [ ] Trivy security scan
+  - [x] Trivy security scan
   - [x] Docker build & push (latest + releases)
 
 ## References

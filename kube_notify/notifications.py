@@ -2,6 +2,7 @@ import kube_notify
 import kube_notify.discord as discord
 import kube_notify.gotify as gotify
 import kube_notify.logger as logger
+import kube_notify.mattermost as mattermost
 import kube_notify.selectors as selectors
 
 
@@ -71,5 +72,16 @@ async def handle_notify(
                         title,
                         description,
                         fields,
+                    )
+                if group_values := group.get("mattermost"):
+                    notifs.append(f"{group_name}/mattermost")
+                    mattermost.send_mattermost_message(
+                        group_values["url"],
+                        title,
+                        description,
+                        fields,
+                        group_values.get("channel"),
+                        group_values.get("username"),
+                        group_values.get("icon_url"),
                     )
     logger.logger.info(f"{event_info[0]} [{','.join(notifs)}] {description}")
