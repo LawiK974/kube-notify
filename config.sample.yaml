@@ -23,6 +23,11 @@ notifications:
       webhook: toto
       username: kube-notify
       # avatar_url: changeme
+    mattermost:
+      webhook: https://chat.local/hooks/aaaaaaaaa
+      # username: kube-notify
+      # icon_url: https://kubernetes.io/images/k8s-10th-birthday.svg
+      # channel: Kube-notify
   custom_group:
     resources:
       - name: customResources
