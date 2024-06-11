@@ -22,7 +22,7 @@ importlib-metadata = "^7.1.0"
 pre-commit = "^3.7.1"
 black = "^24.4.2"
 pytest = "^8.2.1"
-pytest-asyncio = "^0.23.6"
+pytest-asyncio = "^0.23.7"
 pytest-mock = "^3.14.0"
 
 [build-system]
