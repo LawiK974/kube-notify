@@ -16,7 +16,7 @@ def send_mattermost_message(
 ) -> None:
     # Construct the HTTP request for sending a message to Mattermost
     headers = {"Content-Type": "application/json"}
-    message = f"#### {title} : {description}\n"
+    message = f"##### {title} : {description}\n"
 
     for key, value in fields.items():
         message += f"**{key} :** {value}\n"
