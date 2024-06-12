@@ -76,7 +76,7 @@ async def handle_notify(
                 if group_values := group.get("mattermost"):
                     notifs.append(f"{group_name}/mattermost")
                     mattermost.send_mattermost_message(
-                        group_values["url"],
+                        group_values["webhook"],
                         title,
                         description,
                         fields,
