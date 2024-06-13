@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kube-notify"
-version = "0.1.1"
+version = "0"
 description = "A simple python app to relay k8s events to gotify"
 authors = ["wikle <loic97429@gmail.com>"]
 license = "MIT"
@@ -28,3 +28,6 @@ pytest-mock = "^3.14.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry-dynamic-versioning]
+enable = true
