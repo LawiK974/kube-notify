@@ -96,7 +96,7 @@ async def core_stream(kube_notify_config: dict, iterate: bool = True) -> None:
                     )
                     await asyncio.sleep(0)
                 del stream
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 logger.logger.error(f"{type(e).__name__}: {e}")
                 if not iterate:
                     raise e

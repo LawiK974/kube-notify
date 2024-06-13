@@ -1,5 +1,3 @@
-# import datetime
-
 from kubernetes_asyncio import client
 
 
@@ -9,7 +7,10 @@ def find_container_restart_policy(
     for container in containers:
         if container.name == container_name:
             return container.restart_policy
-    raise KeyError(f"{container_name} not found in containers for pod {pod_name}")
+    # We should never be in the following situation :
+    raise KeyError(
+        f"{container_name} not found in containers for pod {pod_name}"
+    )  # pragma: no cover
 
 
 def get_container_state(restart_policy: str | None, exit_code: int) -> tuple[bool, str]:
@@ -19,9 +20,7 @@ def get_container_state(restart_policy: str | None, exit_code: int) -> tuple[boo
         return True, "restarted"
     if restart_policy == "Never" and exit_code != 0:
         return True, "crashed"
-    if exit_code == 0:
-        return False, "finished"
-    return False, ""
+    return False, ""  # Completed or Running
 
 
 async def generate_pod_termination_events(
@@ -31,16 +30,14 @@ async def generate_pod_termination_events(
     pods: client.V1PodList = await api.list_pod_for_all_namespaces()
     for pod in pods.items:
         containers = (
-            pod.spec.containers
-            or [] + pod.spec.init_containers
-            or [] + pod.spec.ephemeral_containers
-            or []
+            (pod.spec.containers or [])
+            + (pod.spec.init_containers or [])
+            + (pod.spec.ephemeral_containers or [])
         )
         for container_status in (
-            pod.status.container_statuses
-            or [] + pod.status.ephemeral_container_statuses
-            or [] + pod.status.init_container_statuses
-            or []
+            (pod.status.container_statuses or [])
+            + (pod.status.ephemeral_container_statuses or [])
+            + (pod.status.init_container_statuses or [])
         ):
             namespace = pod.metadata.namespace
             pod_name = pod.metadata.name
@@ -59,7 +56,12 @@ async def generate_pod_termination_events(
             if is_error:
                 reason = status.terminated.reason
                 timestamp = status.terminated.finished_at
-                message = status.terminated.message
+                message = (
+                    f"{reason}({exit_code}): Container {container_name} {state} "
+                    f"(restartCount: {restart_count})"
+                )
+                if status.terminated.message:
+                    message += f"{', message :\n' + status.terminated.message}"
                 events.append(
                     client.CoreV1Event(
                         kind="Event",
@@ -70,8 +72,7 @@ async def generate_pod_termination_events(
                         ),
                         reason=reason,
                         last_timestamp=timestamp,
-                        message=message
-                        or f"{reason}({exit_code}): Container {container_name} {state} (restartCount: {restart_count})",
+                        message=message,
                         involved_object=client.V1ObjectReference(
                             kind="Pod", name=pod_name, namespace=namespace
                         ),

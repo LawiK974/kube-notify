@@ -1,0 +1,28 @@
+name: Pytest
+
+on: [push]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python # Set Python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pipx
+          python -m pipx install poetry
+          poetry install
+      - name: Test with pytest
+        run: export PYTHONUNBUFFERED=1 && poetry run pytest --cov

@@ -1,0 +1,52 @@
+name: Pytest
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python # Set Python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pipx
+          python -m pipx install poetry
+          poetry install
+      - name: Test with pytest
+        run: export PYTHONUNBUFFERED=1 && poetry run pytest --cov --cov-report=xml --cov-report=term --cov-report=html --junit-xml=report.xml
+      - name: Genbadge coverage
+        run: poetry run genbadge coverage -i coverage.xml
+      - name: Genbadge tests
+        run: poetry run genbadge tests -i report.xml
+      - name: move artifacts to htmlcov
+        run: mv report.xml coverage.xml coverage-badge.svg tests-badge.svg ./htmlcov/
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload coverage report
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './htmlcov'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
