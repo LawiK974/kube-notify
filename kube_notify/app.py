@@ -8,7 +8,19 @@ from kube_notify.stream import core_stream, crds_stream
 from kube_notify.utils import logger, misc
 
 
-def start_kube_notify_loop(kube_notify_config: dict, iterate: bool = True) -> None:
+def start_kube_notify_loop(
+    kube_notify_config: dict,
+    in_cluster: bool = True,
+    context: str | None = None,
+    iterate: bool = True,
+) -> None:
+    ioloop = asyncio.new_event_loop()
+    asyncio.set_event_loop(ioloop)
+    # Initialize Kubernetes client
+    if in_cluster:  # pragma: no cover
+        config.load_incluster_config()
+    else:
+        ioloop.run_until_complete(config.load_kube_config(context=context))
     logger.logger.info(
         f"Starting kube-notify {kube_notify.__version__} at {kube_notify.STARTUP_TIME}"
     )
@@ -36,32 +48,25 @@ def start_kube_notify_loop(kube_notify_config: dict, iterate: bool = True) -> No
                         )
                     )
                 )
-        else:
+        else:  # pragma: no cover
+            # if crd configuration is missing "type"
             error = f"Couldn't get CRD type from 'customResources' at index {index}"
             logger.logger.error(error)
             raise ValueError(error)
     try:
-        kube_notify.ioloop.run_until_complete(asyncio.wait(tasks))
-        # kube_notify.ioloop.run_forever()
+        ioloop.run_until_complete(asyncio.wait(tasks))
     except Exception as e:
         logger.logger.error("[Error] Ignoring :" + e)
     finally:
-        kube_notify.ioloop.run_until_complete(kube_notify.ioloop.shutdown_asyncgens())
-        kube_notify.ioloop.close()
+        ioloop.run_until_complete(ioloop.shutdown_asyncgens())
+        ioloop.close()
 
 
-def main() -> None:
+def main() -> None:  # pragma: no cover
     args = kube_notify.parser.parse_args()
-    # Initialize Kubernetes client
-    if args.inCluster:
-        config.load_incluster_config()
-    else:
-        kube_notify.ioloop.run_until_complete(
-            config.load_kube_config(context=args.context)
-        )
     kube_notify_config = misc.load_kube_notify_config(args.config)
-    start_kube_notify_loop(kube_notify_config)
+    start_kube_notify_loop(kube_notify_config, args.inCluster, args.context)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

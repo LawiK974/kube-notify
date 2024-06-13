@@ -6,7 +6,9 @@ notifications:
           reasons:  # list work as a `or`
             - ApplyJob  # Recurrent K3s HelmChart apply job
             - Unhealthy
-            - Scheduled
+            # - Scheduled
+            - SuccessfulCreate
+            - SuccessfulDelete
             - Created
             - AddedInterface
             - Pulled
@@ -32,7 +34,7 @@ notifications:
     discord:
       webhook: toto
       username: kube-notify
-      # avatar_url: changeme
+      avatar_url: changeme
     mattermost:
       webhook: https://chat.local/hooks/aaaaaaaaa
       # username: kube-notify

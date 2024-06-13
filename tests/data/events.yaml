@@ -1,0 +1,54 @@
+test_pod_created:
+  type: Normal
+  involved_object:
+    kind: Pod
+    name: test-pod
+    namespace: default
+  reason: Scheduled
+  message: This is a test event
+  log_message: "[default_group/discord,default_group/gotify,default_group/mattermost] [✅] Pod test-pod Scheduled."
+
+test_pod_created_excluded:
+  type: Normal
+  involved_object:
+    kind: Job
+    name: test-job
+    namespace: default
+  reason: Created
+  message: This is a test event
+  log_message: "[Excluded] [✅] Job test-job Created."
+
+test_deleted_pod:
+  type: Normal
+  involved_object:
+    kind: Pod
+    name: unknown
+    namespace: default
+  reason: Killing
+  message: This is a test event
+  log_message: "[Excluded] [✅] Pod unknown Killing."
+
+test_pod_oomkilled:
+  log_message: "[default_group/discord,default_group/gotify,default_group/mattermost] [💥] Pod test-pod OOMKilled."
+
+test_pod_crashed:
+  log_message: "[default_group/discord,default_group/gotify,default_group/mattermost] [💥] Pod website Error."
+
+test_unhealthy_pod:
+  type: Warning
+  involved_object:
+    kind: Pod
+    name: cloud
+    namespace: default
+  reason: Unhealthy
+  message: Liveness Probe failed.
+  log_message: "[Excluded] [⚠️] Pod cloud Unhealthy."
+
+test_unknown_event:
+  type: Unknown
+  involved_object:
+    kind: Unknown
+    name: Unknown
+  reason: Unknown
+  message: Unknown
+  log_message: "[default_group/discord,default_group/gotify,default_group/mattermost] [🔔] Unknown Unknown Unknown."

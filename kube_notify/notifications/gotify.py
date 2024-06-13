@@ -11,7 +11,7 @@ def send_gotify_message(
     # Construct the HTTP request for sending a message to Gotify
     url = f"{url}/message?token={token}&format=markdown"
     headers = {"Content-Type": "application/json"}
-    message = f"**{description}**\\\n"
+    message = f"**{description}**\n\n"
 
     for key, value in fields.items():
         message += f"**{key} :** {value}\\\n"

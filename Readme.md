@@ -5,6 +5,8 @@
 ![GitHub Release](https://img.shields.io/github/v/release/LawiK974/kube-notify?display_name=release&link=https%3A%2F%2Fgithub.com%2FLawiK974%2Fkube-notify%2Freleases%2Flatest)
 ![GitHub Actions Workflow Status Main](https://img.shields.io/github/actions/workflow/status/LawiK974/kube-notify/github-actions-docker.yml?branch=main&label=Build%26Push%20Main)
 ![GitHub Actions Workflow Status Release](https://img.shields.io/github/actions/workflow/status/LawiK974/kube-notify/github-actions-docker-tags.yml?label=Build%26Push%20Release)
+[![tests](https://lawik974.github.io/kube-notify/tests-badge.svg)](https://lawik974.github.io/kube-notify/)
+[![coverage](https://lawik974.github.io/kube-notify/coverage-badge.svg)](https://lawik974.github.io/kube-notify/)
 
 
 An app that watches kubernetes resource creation, deletion, updates and errors events and notify selected events to gotify.
@@ -37,6 +39,32 @@ kubectl apply -f deployement.yaml
 
 All configuration are in `/app/config.yaml` file.
 Use [sample config](./config.sample.yaml) as an example.
+
+## Contributing
+
+**Installing**
+
+After installing `poetry` and `pyenv` you should do :
+
+```sh
+poetry install
+```
+
+**Launching tests**
+
+```sh
+poetry run pytest --cov
+```
+
+**Kube-notify locally against a remote cluster**
+
+1.
+2.
+
+```sh
+export PYTHONUNBUFFERED=1
+poetry run kube-notify -c config.yaml
+```
 
 ## To do
 
