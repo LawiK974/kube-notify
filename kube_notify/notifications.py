@@ -15,12 +15,12 @@ def get_status_icon(event_type: str, fields: dict) -> str:
         return "✅"
     if fields.get("Status") == "InProgress":
         return "⏳"
-    if fields.get("Status") == "New":
-        return "🆕"
     if fields.get("Status") == "PartiallyFailed":
         return "⚠️"
     if fields.get("Status") == "Failed":
         return "❌"
+    if fields.get("Status") in ["New", "{}"] or event_type == "ADDED":
+        return "🆕"
     return ""
 
 
@@ -29,7 +29,7 @@ async def handle_notify(
     title: str,
     description: str,
     fields: dict,
-    event_info: str,
+    event_info: kube_notify.EventInfo,
     kube_notify_config: dict,
     resource_type: str,
     labels: dict,

@@ -9,7 +9,7 @@ def send_mattermost_message(
     webhook: str,
     title: str,
     description: str,
-    fields: dict,
+    fields: dict[str, str],
     channel: str | None = None,
     username: str | None = None,
     icon_url: str | None = None,

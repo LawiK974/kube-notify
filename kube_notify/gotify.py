@@ -6,7 +6,7 @@ import kube_notify.logger as logger
 
 
 def send_gotify_message(
-    url: str, token: str, title: str, description: str, fields: dict
+    url: str, token: str, title: str, description: str, fields: dict[str, str]
 ) -> None:
     # Construct the HTTP request for sending a message to Gotify
     url = f"{url}/message?token={token}&format=markdown"

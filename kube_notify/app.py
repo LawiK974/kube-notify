@@ -2,8 +2,8 @@ import asyncio
 import datetime
 import os
 
-import kubernetes_asyncio
 import yaml
+from kubernetes_asyncio import client, config
 
 import kube_notify
 import kube_notify.logger as logger
@@ -23,7 +23,7 @@ def process_last_timestamp(obj: dict, crd: dict) -> datetime.datetime:
     return last_timestamp
 
 
-def add_fields_to_the_message(obj: dict, crd: dict) -> dict:
+def add_fields_to_the_message(obj: dict, crd: dict) -> dict[str, str]:
     # add fields to Message
     fields = {}
     for key, yaml_path in crd.get("includeFields", {}).items():
@@ -34,14 +34,18 @@ def add_fields_to_the_message(obj: dict, crd: dict) -> dict:
     return fields
 
 
-async def crds_stream(crd: dict, namespace: str, kube_notify_config: dict) -> None:
-    async with kubernetes_asyncio.client.ApiClient() as api:
+async def crds_stream(
+    crd: dict, namespace: str, kube_notify_config: dict, iterate: bool = True
+) -> None:
+    async with client.ApiClient() as api:
         last_event_info = None
         # Watch Velero Backups
         crd_group, crd_version, crd_plural = crd.get("type").split("/")
-        crds_api = kubernetes_asyncio.client.CustomObjectsApi(api)
+        crds_api = client.CustomObjectsApi(api)
         event_infos = set()
-        while True:
+        first_loop = True
+        while iterate or first_loop:
+            first_loop = False
             try:
                 logger.logger.debug(f"Strating New loop for crds {crd.get('type')}")
                 stream = None
@@ -99,18 +103,24 @@ async def crds_stream(crd: dict, namespace: str, kube_notify_config: dict) -> No
                 del stream
             except Exception as e:
                 logger.logger.error(f"{type(e).__name__}: {e}")
-            await asyncio.sleep(crd.get("pollingIntervalSeconds", 60))
+                if not iterate:
+                    raise e
+            iterate and await asyncio.sleep(crd.get("pollingIntervalSeconds", 60))
 
 
-async def core_stream(kube_notify_config: dict) -> None:
-    async with kubernetes_asyncio.client.ApiClient() as api:
+async def core_stream(kube_notify_config: dict, iterate: bool = True) -> None:
+    async with client.ApiClient() as api:
         last_event_info = None
-        core_api = kubernetes_asyncio.client.CoreV1Api(api)
+        core_api = client.CoreV1Api(api)
         event_infos = set()
-        while True:
+        first_loop = True
+        while iterate or first_loop:
+            first_loop = False
             try:
                 logger.logger.debug("Strating New loop for core api")
-                stream = await core_api.list_event_for_all_namespaces(watch=False)
+                stream: client.CoreV1EventList = (
+                    await core_api.list_event_for_all_namespaces(watch=False)
+                )
                 for obj in stream.items:
                     event_type = str(obj.type)
                     resource_name = str(obj.metadata.name)
@@ -179,7 +189,9 @@ async def core_stream(kube_notify_config: dict) -> None:
                 del stream
             except Exception as e:
                 logger.logger.error(f"{type(e).__name__}: {e}")
-            await asyncio.sleep(
+                if not iterate:
+                    raise e
+            iterate and await asyncio.sleep(
                 kube_notify_config["events"]["coreApiEvents"].get(
                     "pollingIntervalSeconds", 60
                 )
@@ -197,15 +209,13 @@ def main() -> None:
     logger.logger.info(
         f"Starting kube-notify {kube_notify.__version__} at {kube_notify.STARTUP_TIME}"
     )
-    logger.logger.info(f"PYTHONUNBUFFERED={os.environ["PYTHONUNBUFFERED"]}")
+    logger.logger.info(f"PYTHONUNBUFFERED={os.environ['PYTHONUNBUFFERED']}")
     # Initialize Kubernetes client
     ioloop = asyncio.get_event_loop()
     if args.inCluster:
-        kubernetes_asyncio.config.load_incluster_config()
+        config.load_incluster_config()
     else:
-        ioloop.run_until_complete(
-            kubernetes_asyncio.config.load_kube_config(context=args.context)
-        )
+        ioloop.run_until_complete(config.load_kube_config(context=args.context))
 
     kube_notify_config = load_kube_notify_config(args.config)
     tasks = []

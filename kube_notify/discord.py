@@ -9,7 +9,7 @@ def send_discord_webhook(
     webhook_url: str,
     title: str,
     description: str,
-    fields: dict,
+    fields: dict[str, str],
     username: str = "kube-notify",
     avatar_url: str = None,
 ) -> None:

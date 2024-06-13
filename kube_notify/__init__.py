@@ -2,7 +2,8 @@ import argparse
 import datetime
 
 __version__ = "0.0.0"
-STARTUP_TIME = datetime.datetime.utcnow()
+STARTUP_TIME = datetime.datetime.now(datetime.UTC)
+type EventInfo = tuple[datetime.datetime, str, str, str, str, str, str, str]
 
 parser = argparse.ArgumentParser(
     prog=f"kube-notify-{__version__}",
