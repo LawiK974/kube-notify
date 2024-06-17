@@ -21,12 +21,12 @@ repos:
         args: [--preview]
 
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.18.3  # Specify the desired version of Gitleaks
+  rev: v8.18.4  # Specify the desired version of Gitleaks
   hooks:
     - id: gitleaks
 
 -   repo: https://github.com/pycqa/flake8
-    rev: 7.0.0
+    rev: 7.1.0
     hooks:
     -   id: flake8
         additional_dependencies:
