@@ -9,7 +9,7 @@ license = "MIT"
 kube-notify = "kube_notify.app:main"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.13"
 requests = "^2.32.3"
 argparse = "^1.4.0"
 PyYAML = "^6.0.1"
@@ -18,7 +18,7 @@ DateTime = "^5.5"
 pytz = "^2024.1"
 importlib-metadata = "^7.1.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pre-commit = "^3.7.1"
 black = "^24.4.2"
 pytest = "^8.2.2"

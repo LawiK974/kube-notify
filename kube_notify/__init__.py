@@ -1,8 +1,7 @@
 import argparse
 import datetime
-import importlib.metadata
 
-__version__ = importlib.metadata.version(__name__)
+__version__ = "0.0.0"
 STARTUP_TIME = datetime.datetime.utcnow()
 
 parser = argparse.ArgumentParser(
