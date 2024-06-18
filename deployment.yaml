@@ -59,13 +59,11 @@ metadata:
   namespace: "*"
   name: kube-notify-watcher
 rules:
-  - apiGroups:
-    - "*"
-    resources:
-    - "*"
+  - apiGroups: [""]
+    resources: ["pods", "events"]
     verbs:  ["get", "watch", "list"]
-  - nonResourceURLs:
-    - "*"
+  - apiGroups: ["velero.io"]
+    resources: ["backups", "restores"]
     verbs: ["get", "watch", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
