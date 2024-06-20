@@ -16,7 +16,6 @@ PyYAML = "^6.0.1"
 kubernetes-asyncio = "^30.1.0"
 DateTime = "^5.5"
 pytz = "^2024.1"
-importlib-metadata = "^7.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.7.1"
@@ -31,3 +30,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry-dynamic-versioning]
 enable = true
+
+[tool.poetry-pyinstaller-plugin.scripts]
+kube-notify = { source = "kube_notify/app.py", type = "onefile", bundle = false }

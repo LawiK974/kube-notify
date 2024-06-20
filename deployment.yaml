@@ -17,6 +17,10 @@ spec:
         app: kube-notify
     spec:
       serviceAccountName: kube-notify-watcher
+      securityContext:
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+        runAsNonRoot: true
       containers:
       - name: kube-notify
         resources:
@@ -36,7 +40,7 @@ spec:
         #         command:
         #         - /bin/sh
         #         - -c
-        #         - wget -O /usr/local/share/ca-certificates/acr.pem --no-check-certificate https://mydomain/acr.pem && update-ca-certificates
+        #         - wget -O - --no-check-certificate https://mydomain/acr.pem >> /etc/ssl/certs/ca-certificates.crt
         volumeMounts:
         - name: config
           mountPath: /app/config.yaml

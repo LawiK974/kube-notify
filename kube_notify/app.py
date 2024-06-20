@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import os
 
 import kubernetes_asyncio
 import yaml
@@ -196,6 +197,7 @@ def main() -> None:
     logger.logger.info(
         f"Starting kube-notify {kube_notify.__version__} at {kube_notify.STARTUP_TIME}"
     )
+    logger.logger.info(f"PYTHONUNBUFFERED={os.environ["PYTHONUNBUFFERED"]}")
     # Initialize Kubernetes client
     ioloop = asyncio.get_event_loop()
     if args.inCluster:
