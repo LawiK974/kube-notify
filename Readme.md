@@ -46,7 +46,12 @@ Use [sample config](./config.sample.yaml) as an example.
   - [x] CI passing
   - [x] License
   - [ ] Coverage
-- [ ] Add OpenAI module to send recomendation messages for non-normal events.
+- Fonctionnalities
+  - [x] Stream CoreAPI Events
+  - [x] Possibility to stream Velero backups
+  - [x] Filter notifications on the following criteria : types, reasons, labels, namespaces, involvedObjectKind
+  - [ ] Track Pod termination reasons
+  - [ ] Add OpenAI module to send recomendation messages for non-normal events.
 - [ ] Create Helm chart
 - [ ] Documenting
   - [x] Installation
