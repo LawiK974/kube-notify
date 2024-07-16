@@ -1,9 +1,12 @@
 import argparse
+import asyncio
 import datetime
 
 __version__ = "0.0.0"
-STARTUP_TIME = datetime.datetime.utcnow()
-
+STARTUP_TIME = datetime.datetime.now(datetime.UTC).replace(tzinfo=None)
+type EventInfo = tuple[datetime.datetime, str, str, str, str, str, str, str]
+ioloop = asyncio.new_event_loop()
+asyncio.set_event_loop(ioloop)
 parser = argparse.ArgumentParser(
     prog=f"kube-notify-{__version__}",
     description="An app that watches kubernetes resource creation, deletion, updates and errors events and notify selected events to gotify.",
