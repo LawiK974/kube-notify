@@ -67,7 +67,7 @@ async def core_stream(kube_notify_config: dict, iterate: bool = True) -> None:
                                 involved_object_name, involved_object_namespace
                             )
                             labels.update(dict(pod.metadata.labels or {}))
-                            fields.update({"Node": pod.spec.nodeName})
+                            fields.update({"Node": pod.spec.node_name})
                         except Exception:
                             pass
                     event_infos.add(event_info)
