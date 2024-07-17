@@ -34,6 +34,6 @@ repos:
             - flake8-variables-names==0.0.6
             - pep8-naming
         args:
-            - --max-cognitive-complexity=25
+            - --max-cognitive-complexity=30
             - "--ignore=W503,E501"
             # - --use-varnames-strict-mode

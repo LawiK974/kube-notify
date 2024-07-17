@@ -5,6 +5,12 @@ notifications:
         excludeSelector:  # use `excludeSelector` to exclude events that match one of the following
           reasons:  # list work as a `or`
             - ApplyJob  # Recurrent K3s HelmChart apply job
+            - Unhealthy
+            - Scheduled
+            - Created
+            - AddedInterface
+            - Pulled
+            - Killing
           involvedObjectKind:  # list work as a `or`
             - Job
             - CronJob
@@ -15,6 +21,10 @@ notifications:
           #   - kube-system
           # types:
             # - Normal
+      - name: coreApiEvents
+        selector:
+          types:
+            - Error  # includes PodTerminationErrors
       - name: customResources
     gotify:
       url: https://gotify.example.local
@@ -45,6 +55,7 @@ notifications:
 events:
   coreApiEvents:
     enabled: true  # disable to not watch kubernetes core API "Events" resources
+    addPodTerminationErrors: true  # parse all pod statuses to detect restart reasons as Errors and append to coreApiEvents
     # pollingIntervalSeconds: 60  # Uncomment to change default
 
   customResources:

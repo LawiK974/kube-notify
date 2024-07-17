@@ -6,6 +6,8 @@ from kubernetes_asyncio import client
 import kube_notify.notifications as notifs
 from kube_notify.utils import logger
 
+from . import pod_terminations
+
 
 async def core_stream(kube_notify_config: dict, iterate: bool = True) -> None:
     async with client.ApiClient() as api:
@@ -20,7 +22,14 @@ async def core_stream(kube_notify_config: dict, iterate: bool = True) -> None:
                 stream: client.CoreV1EventList = (
                     await core_api.list_event_for_all_namespaces(watch=False)
                 )
-                for obj in stream.items:
+                stream_items = stream.items
+                if kube_notify_config["events"]["coreApiEvents"].get(
+                    "addPodTerminationErrors"
+                ):
+                    stream_items += (
+                        await pod_terminations.generate_pod_termination_events(core_api)
+                    )
+                for obj in stream_items:
                     event_type = str(obj.type)
                     resource_name = str(obj.metadata.name)
                     resource_kind = str(obj.kind or "Event")
