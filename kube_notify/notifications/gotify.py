@@ -14,10 +14,10 @@ def send_gotify_message(
     message = f"**{description}**\\\n"
 
     for key, value in fields.items():
-        message += f"**{key} : **{value}\\\n"
+        message += f"**{key} :** {value}\\\n"
     data = {
         "title": title,
-        "message": message,
+        "message": message.strip().strip("\\"),
         "extras": {"client::display": {"contentType": "text/markdown"}},
     }
     response = requests.post(url, headers=headers, data=json.dumps(data))
