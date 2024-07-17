@@ -9,6 +9,8 @@ def get_status_icon(event_type: str, fields: dict) -> str:
         return "⚠️"
     if event_type == "Normal":
         return "✅"
+    if event_type == "Error":
+        return "💥"
     if fields.get("Status") == "Completed":
         return "✅"
     if fields.get("Status") == "InProgress":
@@ -19,7 +21,7 @@ def get_status_icon(event_type: str, fields: dict) -> str:
         return "❌"
     if fields.get("Status") in ["New", "{}"] or event_type == "ADDED":
         return "🆕"
-    return ""
+    return "🔔"
 
 
 async def handle_notify(
