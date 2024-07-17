@@ -7,9 +7,10 @@
         {
             "name": "Debug : kube-notify",
             "type": "debugpy",
+            // "pythonPath": ".venv/bin/python",
             "request": "launch",
-            "module": "kube-notify",
-            "args": ["-c", "config.sample.yaml"]
+            "module": "kube_notify.app",
+            "args": ["-c", "config.yaml"]
         }
     ]
 }
