@@ -606,13 +606,13 @@ files = [
 
 [[package]]
 name = "kubernetes-asyncio"
-version = "30.3.1"
+version = "31.1.1"
 description = "Kubernetes asynchronous python client"
 optional = false
 python-versions = "*"
 files = [
-    {file = "kubernetes_asyncio-30.3.1-py3-none-any.whl", hash = "sha256:9c65f79aef0a0c36149c562cec036dd21466dc64dca2ebd36b02d8ae2954d897"},
-    {file = "kubernetes_asyncio-30.3.1.tar.gz", hash = "sha256:53efb902e89149a9720e00b45f964b87ea7cb8ec4110110c574d028817da1764"},
+    {file = "kubernetes_asyncio-31.1.1-py3-none-any.whl", hash = "sha256:d5e441674fde5dd8d0366cb6a204d7fbaef8d0dce7ca7a34c0791af0d13b6ff1"},
+    {file = "kubernetes_asyncio-31.1.1.tar.gz", hash = "sha256:393bb60a2740d482651d474956296b341348c3e4f883b171740e5a4bf105a87b"},
 ]
 
 [package.dependencies]
@@ -1315,4 +1315,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.12,<3.13"
-content-hash = "976a291f7fa2b1e3a17cfa2848b23ee7a7d67ee312c7c7ede933099102719cea"
+content-hash = "3d188886039021216a21446bd7534e3e812a03e7d18aaf72f550121227cc2d45"
