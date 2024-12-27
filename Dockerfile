@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED=1 REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 WORKDIR /app
 COPY . /app
 RUN apk add --no-cache gcc musl-dev libffi-dev git \
-    && pip install poetry==1.8.3 pyinstaller==6.8.0 virtualenv==20.26.2 && \
+    && pip install poetry==1.8.5 pyinstaller==6.11.1 virtualenv==20.28.0 && \
     # Install poetry version plugin see https://github.com/tiangolo/poetry-version-plugin
     poetry self add "poetry-dynamic-versioning[plugin]==v1.3.0" && \
     poetry self add "poetry-pyinstaller-plugin==1.1.10" && \
