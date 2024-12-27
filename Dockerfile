@@ -1,5 +1,5 @@
 # Stage 1: Builder stage where the package is built using Poetry
-FROM python:alpine AS builder
+FROM python:3.13.1-alpine3.21 AS builder
 
 ENV PYTHONUNBUFFERED=1 REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 WORKDIR /app
@@ -7,8 +7,8 @@ COPY . /app
 RUN apk add --no-cache gcc musl-dev libffi-dev git \
     && pip install poetry==1.8.5 pyinstaller==6.11.1 virtualenv==20.28.0 && \
     # Install poetry version plugin see https://github.com/tiangolo/poetry-version-plugin
-    poetry self add "poetry-dynamic-versioning[plugin]==v1.3.0" && \
-    poetry self add "poetry-pyinstaller-plugin==1.1.10" && \
+    poetry self add "poetry-dynamic-versioning[plugin]==v1.4.1" && \
+    poetry self add "poetry-pyinstaller-plugin==1.2.1" && \
     # Build the package (this creates the package wheel)
     poetry build
 
