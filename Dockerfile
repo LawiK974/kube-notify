@@ -19,7 +19,7 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certifi
 COPY --from=builder /app/dist/pyinstaller/*/* /usr/local/bin/
 # get necessary libc libraries
 COPY --from=builder /lib/ld-musl-*.so.1 /lib/
-COPY --from=builder /lib/libz.so.1 /lib/libz.so.1
+COPY --from=builder /usr/lib/libz.so.1 /lib/libz.so.1
 RUN export ARCH=$(uname -m) && \
     ln -snf "/lib/ld-musl-${ARCH}.so.1" "/lib/libc.musl-${ARCH}.so.1" && \
     chmod a+rx /usr/local/bin/kube-notify && \
