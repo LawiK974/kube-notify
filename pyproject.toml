@@ -21,7 +21,7 @@ pytz = "^2024.2"
 pre-commit = "^4.0.1"
 black = "^24.10.0"
 pytest = "^8.3.4"
-pytest-asyncio = "^0.25.0"
+pytest-asyncio = "^0.25.1"
 pytest-mock = "^3.14.0"
 pytest-cov = "^6.0.0"
 genbadge = {extras = ["tests","coverage"], version = "^1.1.1"}
