@@ -18,7 +18,7 @@ DateTime = "^5.5"
 pytz = "^2025.1"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^4.0.1"
+pre-commit = "^4.3.0"
 black = "^25.1.0"
 pytest = "^8.3.4"
 pytest-asyncio = "^0.25.0"
