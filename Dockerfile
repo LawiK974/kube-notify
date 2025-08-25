@@ -1,5 +1,5 @@
 # Stage 1: Builder stage where the package is built using Poetry
-FROM python:3.12.8-alpine3.21 AS builder
+FROM python:3.13.7-alpine3.21 AS builder
 
 ENV PYTHONUNBUFFERED=1 REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 WORKDIR /app
