@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
@@ -10,23 +10,23 @@ repos:
         args: [--allow-multiple-documents]
     -   id: check-added-large-files
 -   repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+    rev: 7.0.0
     hooks:
     -   id: isort
         args: ["--profile", "black"]
--   repo: https://github.com/psf/black
-    rev: 24.10.0
+-   repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 25.11.0
     hooks:
     -   id: black
         args: [--preview]
 
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.22.1  # Specify the desired version of Gitleaks
+  rev: v8.29.1  # Specify the desired version of Gitleaks
   hooks:
     - id: gitleaks
 
 -   repo: https://github.com/pycqa/flake8
-    rev: 7.1.1
+    rev: 7.3.0
     hooks:
     -   id: flake8
         additional_dependencies:
