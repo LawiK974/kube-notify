@@ -30,9 +30,11 @@ def fake_pods() -> dict[str, client.V1Pod]:
                                 terminated=(
                                     client.V1ContainerStateTerminated(
                                         **{
-                                            "finished_at": datetime.datetime.now(
-                                                datetime.UTC
-                                            ).replace(tzinfo=None),
+                                            "finished_at": (
+                                                datetime.datetime.now(
+                                                    datetime.UTC
+                                                ).replace(tzinfo=None)
+                                            ),
                                             **e.get("last_state", {}).get("terminated"),
                                         }
                                     )
