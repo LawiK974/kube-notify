@@ -37,7 +37,7 @@ jobs:
           docker build -t docker.io/wikle/kube-notify:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@latest
+        uses: aquasecurity/trivy-action@v6
         with:
           image-ref: 'docker.io/wikle/kube-notify:${{ github.sha }}'
           format: 'sarif'
@@ -45,6 +45,6 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@latest
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'trivy-results.sarif'
