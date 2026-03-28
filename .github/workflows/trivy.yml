@@ -37,7 +37,7 @@ jobs:
           docker build -t docker.io/wikle/kube-notify:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.35.0
         with:
           image-ref: 'docker.io/wikle/kube-notify:${{ github.sha }}'
           format: 'sarif'
