@@ -1,17 +1,16 @@
 # Stage 1: Builder stage where the package is built using Poetry
-FROM python:3.14.1-alpine3.21 AS builder
+FROM python:3.14.3-alpine3.23 AS builder
 
 ENV PYTHONUNBUFFERED=1 REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 WORKDIR /app
 COPY . /app
-RUN apk add --no-cache gcc musl-dev libffi-dev git \
-    && pip install poetry==2.3.2 pyinstaller==6.19.0 virtualenv==21.2.0 && \
+RUN apk add --no-cache gcc musl-dev libffi-dev git tree \
+    && pip install -U pip && pip install poetry==2.3.2 pyinstaller==6.19.0 virtualenv==21.2.0 && \
     # Install poetry version plugin see https://github.com/tiangolo/poetry-version-plugin
     poetry self add "poetry-dynamic-versioning[plugin]==v1.10.0" && \
     poetry self add "poetry-pyinstaller-plugin==2.0.2" && \
     # Build the package (this creates the package wheel)
-    poetry build
-
+    poetry build && tree /app/dist
 # Stage 2: Lightweight production stage with minimal footprint
 FROM busybox:musl
 
