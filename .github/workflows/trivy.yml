@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@latest
+        uses: actions/checkout@v6
         with:
           fetch-tags: true
           fetch-depth: 0
@@ -37,7 +37,7 @@ jobs:
           docker build -t docker.io/wikle/kube-notify:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v6
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           image-ref: 'docker.io/wikle/kube-notify:${{ github.sha }}'
           format: 'sarif'
