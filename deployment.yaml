@@ -18,17 +18,25 @@ spec:
     spec:
       serviceAccountName: kube-notify-watcher
       securityContext:
-        readOnlyRootFilesystem: true
-        allowPrivilegeEscalation: false
-        runAsNonRoot: true
+        fsGroup: 2000
       containers:
       - name: kube-notify
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          privileged: false
+          runAsNonRoot: true
+          runAsUser: 65534
+          runAsGroup: 65534
+          seccompProfile:
+            type: RuntimeDefault
+          capabilities:
+            drop: ["ALL"]
         resources:
           requests:
             memory: 500Mi
             cpu: 10m
           limits:
-            cpu: 500m
             memory: 1Gi
         image: wikle/kube-notify:v0.3.1
         env:
@@ -48,6 +56,7 @@ spec:
       volumes:
       - name: config
         configMap:
+          defaultMode: 420
           name: kube-notify-config
 
 ---
