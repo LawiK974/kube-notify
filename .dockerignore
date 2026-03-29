@@ -1,2 +1,14 @@
 config.yaml
 *__pycache__*
+*.dat
+dist/
+htmlcov
+.coverage
+coverage.xml
+report.xml
+build/
+.github/
+.vscode/
+.pytest_cache/
+.venv/
+.poetry/

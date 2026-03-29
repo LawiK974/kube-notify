@@ -6,3 +6,7 @@ htmlcov
 .coverage
 coverage.xml
 report.xml
+build/
+.pytest_cache/
+.venv/
+.poetry/

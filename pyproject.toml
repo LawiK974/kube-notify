@@ -25,6 +25,7 @@ pytest-asyncio = "^0.25.0"
 pytest-mock = "^3.14.0"
 pytest-cov = "^6.0.0"
 genbadge = {extras = ["tests","coverage"], version = "^1.1.1"}
+pyinstaller = "^6.19.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -32,6 +33,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry-dynamic-versioning]
 enable = true
+
+[tool.poetry.requires-plugins]
+poetry-pyinstaller-plugin = { version = ">=2.0.0,<3.0.0", extras = ["plugin"] }
 
 [tool.poetry-pyinstaller-plugin]
 type = "onefile"

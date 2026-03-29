@@ -1,8 +1,8 @@
 # Kube Notify
 
-![GitHub License](https://img.shields.io/github/license/LawiK974/kube-notify)
+[![GitHub License](https://img.shields.io/github/license/LawiK974/kube-notify)](./LICENSE)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-![GitHub Release](https://img.shields.io/github/v/release/LawiK974/kube-notify?display_name=release&link=https%3A%2F%2Fgithub.com%2FLawiK974%2Fkube-notify%2Freleases%2Flatest)
+[![GitHub Release](https://img.shields.io/github/v/release/LawiK974/kube-notify?display_name=release&link=https%3A%2F%2Fgithub.com%2FLawiK974%2Fkube-notify%2Freleases%2Flatest)](https://github.com/LawiK974/kube-notify/releases/latest)
 ![GitHub Actions Workflow Status Main](https://img.shields.io/github/actions/workflow/status/LawiK974/kube-notify/github-actions-docker.yml?branch=main&label=Build%26Push%20Main)
 ![GitHub Actions Workflow Status Release](https://img.shields.io/github/actions/workflow/status/LawiK974/kube-notify/github-actions-docker-tags.yml?label=Build%26Push%20Release)
 [![tests](https://lawik974.github.io/kube-notify/tests-badge.svg)](https://lawik974.github.io/kube-notify/)
@@ -69,16 +69,16 @@ poetry run kube-notify -c config.yaml
 ## To do
 
 - [ ] Optimize Code
-- [ ] Badges
+- [x] Badges
   - [x] Latest release
   - [x] CI passing
   - [x] License
-  - [ ] Coverage
+  - [x] Coverage
 - Fonctionnalities
   - [x] Stream CoreAPI Events
   - [x] Possibility to stream Velero backups
   - [x] Filter notifications on the following criteria : types, reasons, labels, namespaces, involvedObjectKind
-  - [ ] Track Pod termination reasons
+  - [x] Track Pod termination reasons
   - [ ] Add OpenAI module to send recomendation messages for non-normal events.
 - [ ] Create Helm chart
 - [ ] Documenting
@@ -90,11 +90,11 @@ poetry run kube-notify -c config.yaml
   - [x] Mattermost
   - [ ] Slack
   - [ ] Telegram
-- [ ] Automation (GitHub Actions)
-  - [ ] Coverage tests
+- [x] Automation (GitHub Actions)
+  - [x] Coverage tests
   - [x] pre-commit
   - [x] Trivy security scan
-  - [x] Docker build & push (latest + releases)
+  - [x] Docker + ghcr build & push (latest + releases)
 
 ## References
 
