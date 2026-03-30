@@ -38,7 +38,7 @@ spec:
             cpu: 10m
           limits:
             memory: 1Gi
-        image: wikle/kube-notify:v0.3.1
+        image: wikle/kube-notify:v0.3.2
         env:
           - name: REQUESTS_CA_BUNDLE
             value: /etc/ssl/certs/ca-certificates.crt
